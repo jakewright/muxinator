@@ -24,7 +24,7 @@ func NewRouter() Router {
 	return Router{n, m}
 }
 
-// ListenAndServe build the final handler and passes it to http.ListenAndServe
+// ListenAndServe builds the final handler and passes it to http.ListenAndServe
 func (router *Router) ListenAndServe(addr string) error {
 	return http.ListenAndServe(addr, router.BuildHandler())
 }
