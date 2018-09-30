@@ -24,6 +24,11 @@ func NewRouter() Router {
 	return Router{n, m}
 }
 
+// ListenAndServe build the final handler and passes it to http.ListenAndServe
+func (router *Router) ListenAndServe(addr string) error {
+	return http.ListenAndServe(addr, router.BuildHandler())
+}
+
 // BuildHandler returns an http.Handler that can be used as the argument to http.ListenAndServe.
 func (router *Router) BuildHandler() http.Handler {
 	// The mux router needs to be the last item of middleware added to the negroni instance.
