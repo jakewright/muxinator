@@ -1,6 +1,7 @@
 package muxinator
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -15,18 +16,27 @@ type Middleware func(w http.ResponseWriter, r *http.Request, next http.HandlerFu
 type Router struct {
 	n *negroni.Negroni
 	m *mux.Router
+	s *http.Server
 }
 
 // NewRouter returns a new Router instance with some defaults
 func NewRouter() Router {
 	n := negroni.New()
 	m := mux.NewRouter().StrictSlash(true)
-	return Router{n, m}
+	h := &http.Server{}
+	return Router{n, m, h}
 }
 
 // ListenAndServe builds the final handler and passes it to http.ListenAndServe
 func (router *Router) ListenAndServe(addr string) error {
-	return http.ListenAndServe(addr, router.BuildHandler())
+	router.s.Addr = addr
+	router.s.Handler = router.BuildHandler()
+	return router.s.ListenAndServe()
+}
+
+// Shutdown gracefully shuts down the server
+func (router *Router) Shutdown(ctx context.Context) error {
+	return router.s.Shutdown(ctx)
 }
 
 // BuildHandler returns an http.Handler that can be used as the argument to http.ListenAndServe.
