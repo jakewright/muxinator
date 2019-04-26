@@ -56,7 +56,7 @@ func (router *Router) AddMiddleware(middlewares ...Middleware) {
 
 // Handle registers a route with the router. Internally, gorilla mux is used.
 // See https://github.com/gorilla/mux for options available for the path, including variables.
-func (router *Router) Handle(method string, path string, handler http.HandlerFunc, middlewares ...Middleware) {
+func (router *Router) Handle(method string, path string, handler http.Handler, middlewares ...Middleware) {
 	// A slice to hold all of the middleware once it's converted (including the handler itself)
 	var stack []negroni.Handler
 
@@ -67,33 +67,33 @@ func (router *Router) Handle(method string, path string, handler http.HandlerFun
 	}
 
 	// The handler needs to be treated like middleware
-	stack = append(stack, negroni.Wrap(http.HandlerFunc(handler)))
+	stack = append(stack, negroni.Wrap(handler))
 
 	// Handle this path using a new instance of negroni with all of the middleware in our stack
 	router.m.Handle(path, negroni.New(stack...)).Methods(method)
 }
 
 // Get is a helper function to add a GET route
-func (router *Router) Get(path string, handler http.HandlerFunc, middlewares ...Middleware) {
+func (router *Router) Get(path string, handler http.Handler, middlewares ...Middleware) {
 	router.Handle("GET", path, handler, middlewares...)
 }
 
 // Post is a helper function to add a POST route
-func (router *Router) Post(path string, handler http.HandlerFunc, middlewares ...Middleware) {
+func (router *Router) Post(path string, handler http.Handler, middlewares ...Middleware) {
 	router.Handle("POST", path, handler, middlewares...)
 }
 
 // Put is a helper function to add a PUT route
-func (router *Router) Put(path string, handler http.HandlerFunc, middlewares ...Middleware) {
+func (router *Router) Put(path string, handler http.Handler, middlewares ...Middleware) {
 	router.Handle("PUT", path, handler, middlewares...)
 }
 
 // Patch is a helper function to add a PATCH route
-func (router *Router) Patch(path string, handler http.HandlerFunc, middlewares ...Middleware) {
+func (router *Router) Patch(path string, handler http.Handler, middlewares ...Middleware) {
 	router.Handle("PATCH", path, handler, middlewares...)
 }
 
 // Delete is a helper function to add a DELETE route
-func (router *Router) Delete(path string, handler http.HandlerFunc, middlewares ...Middleware) {
+func (router *Router) Delete(path string, handler http.Handler, middlewares ...Middleware) {
 	router.Handle("DELETE", path, handler, middlewares...)
 }
