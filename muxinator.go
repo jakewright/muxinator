@@ -3,6 +3,7 @@ package muxinator
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/urfave/negroni"
@@ -56,6 +57,7 @@ func (router *Router) AddMiddleware(middlewares ...Middleware) {
 
 // Handle registers a route with the router. Internally, gorilla mux is used.
 // See https://github.com/gorilla/mux for options available for the path, including variables.
+// End a path with an asterisk "*" to create a wildcard route.
 func (router *Router) Handle(method string, path string, handler http.Handler, middlewares ...Middleware) {
 	// A slice to hold all of the middleware once it's converted (including the handler itself)
 	var stack []negroni.Handler
@@ -69,8 +71,26 @@ func (router *Router) Handle(method string, path string, handler http.Handler, m
 	// The handler needs to be treated like middleware
 	stack = append(stack, negroni.Wrap(handler))
 
-	// Handle this path using a new instance of negroni with all of the middleware in our stack
-	router.m.Handle(path, negroni.New(stack...)).Methods(method)
+	// Create a new mux route
+	route := router.m.NewRoute()
+
+	// Set the route's handler
+	route.Handler(negroni.New(stack...))
+
+	// If the last character is an asterisk, create
+	// a wildcard route using route.PathPrefix().
+	if strings.HasSuffix(path, "*") {
+		// Be sure to strip the asterisk off again
+		route.PathPrefix(path[:len(path)-1])
+	} else {
+		// Otherwise just add the path normally
+		route.Path(path)
+	}
+
+	// Restrict to a particular method if set
+	if method != "" {
+		route.Methods(method)
+	}
 }
 
 // Get is a helper function to add a GET route
