@@ -47,6 +47,12 @@ func (router *Router) BuildHandler() http.Handler {
 	return router.n
 }
 
+// Match returns whether a route exists for the given request
+func (router *Router) Match(req *http.Request) bool {
+	match := mux.RouteMatch{}
+	return router.m.Match(req, &match)
+}
+
 // AddMiddleware adds middleware that will be applied to every request.
 // Middleware handlers are executed in the order defined.
 func (router *Router) AddMiddleware(middlewares ...Middleware) {

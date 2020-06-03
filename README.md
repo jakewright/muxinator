@@ -1,6 +1,6 @@
 # Muxinator
 
-Muxinator is a simple wrapper around the `gorilla/mux` and `urfave/negroni` packages to make it easier to build an HTTP router with middleware.
+Muxinator is a simple wrapper around the [`gorilla/mux`](https://github.com/gorilla/mux) and [`urfave/negroni`](https://github.com/urfave/negroni) packages to make it easier to build an HTTP router with middleware.
 
 ## Example
 
